@@ -1,8 +1,8 @@
 <template>
   <div class="q-pa-lg">
     <QOptionGroup
-      v-model="group"
-      :options="options"
+      v-model="currentValue"
+      :options="optionList"
       color="primary"
       @update:model-value="selectedItem($event)"
     >
@@ -15,39 +15,49 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { defineProps, ref } from "vue";
-import { IWizard, stepTwo } from "../utils/types";
+<script lang="ts">
+import { ref } from "vue";
+import { stepTwo } from "../utils/types";
 import { ApplicationDS } from "../stores/appState";
+import { Component, Vue, toNative, Ref, Setup, Prop } from "vue-facing-decorator";
 
-const props = defineProps<{
-  stepData: stepTwo;
-}>();
 
-const group = ref("op1");
+@Component
+class ChooseFood extends Vue {
 
-const ApplicationDataStore = ApplicationDS();
+  @Prop({required: true})stepData!: stepTwo
 
-const selectedRestaurant = ApplicationDataStore.getSelectedRestaurant;
+  @Setup(() => ref(ApplicationDS().getSelectedFood))currentValue!: string
 
-const restaurantFoods = props.stepData.data.find(
-  (item) => item.id === selectedRestaurant
-);
+  get selectedRestaurant(){
+    return ApplicationDS().getSelectedRestaurant
+  }
 
-const options: { label: string, value: string }[] = [];
+  get selectedRestaurantFoods(){
+    return  this.stepData.data.find((item)=> item.id === this.selectedRestaurant)
+  }
 
-restaurantFoods!.data.forEach((item) => {
-  const option = {
-    label: item.name,
-    value: item.name
-  };
+  get optionList(){
+    const options: { label: string, value: string }[] = [];
+    this.selectedRestaurantFoods?.data.forEach((item)=>{
+      const option = {
+          label: item.name,
+          value: item.name
+        };
+        options.push(option);
+      })  
 
-  options.push(option);
-});
+    return options
+  }
 
-function selectedItem(value: string) {
-  ApplicationDataStore.setSelectedRestaurant(value);
+  selectedItem(value: string) {
+    ApplicationDS().setSelectedFood(value);
+  }
+
 }
+
+export default toNative(ChooseFood);
+
 </script>
 
 <style scoped></style>

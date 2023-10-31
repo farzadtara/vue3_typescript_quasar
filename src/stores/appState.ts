@@ -3,13 +3,15 @@ import { defineStore } from 'pinia';
 interface IApplicationDS{
     selectedRestaurant: string,
     selectedFood: string
+    orderDetail: string | number | null
 }
 
-export const ApplicationDS = defineStore('appState', {
+export const ApplicationDS = defineStore('applicationds', {
     state: (): IApplicationDS => {
         return {
             selectedRestaurant: '',
-            selectedFood:''
+            selectedFood:'',
+            orderDetail:''
         }
     },
     actions:{
@@ -18,6 +20,9 @@ export const ApplicationDS = defineStore('appState', {
         },
         setSelectedFood(selectedFood: string){
             this.selectedFood = selectedFood
+        },
+        setSelectedOrderDetail(orderDetail: string | number | null){
+            this.orderDetail = orderDetail
         }
     },
     getters:{
@@ -26,6 +31,9 @@ export const ApplicationDS = defineStore('appState', {
         },
         getSelectedFood(state){
             return state.selectedFood
+        },
+        getOrderDetail(state){
+            return state.orderDetail
         }
     }
 });

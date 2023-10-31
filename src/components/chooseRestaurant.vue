@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="q-pa-lg">
-      <QOptionGroup v-model="group" :options="options" color="primary" @update:model-value="selectedItem($event)">
+      <QOptionGroup v-model="currentValue" :options="optionList" color="primary" @update:model-value="selectedItem($event)">
         <template v-slot:label="opt">
           <div class="row items-center option-items">
             <span class="text-teal">{{ opt.label }}</span>
-            <span class="">  {{opt.star}}</span>
+            <!-- <span class="">  {{opt.star}}</span> -->
           </div>
         </template>
       </QOptionGroup>
@@ -13,36 +13,49 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { defineProps, ref } from "vue";
-import { IWizard, stepOne } from "../utils/types";
+<script lang="ts">
+import { Component, Vue, toNative, Ref, Setup, Prop } from "vue-facing-decorator";
+import { ref } from 'vue'
+import { stepOne } from "../utils/types";
 import {ApplicationDS} from '../stores/appState'
 
-const group = ref("op1");
 
-const ApplicationDataStore = ApplicationDS()
+@Component({
+    components:{}
+})
+class ChooseRestaurant extends Vue {
 
-const props = defineProps<{
-  stepData: stepOne;
-}>();
+  @Prop({ required: true}) stepData!: stepOne
 
-const options: { label: string; value: string; disable: boolean, star: string }[] = [];
+  @Setup(() => ref(ApplicationDS().getSelectedRestaurant))currentValue!: string
 
-props.stepData.data.forEach((item) => {
-  const option = {
-    label: item.name,
-    value: item.id,
-    disable: item.available,
-    star:item.star
-  };
+  get optionList(){
+    const options: { label: string; value: string; disable: boolean, star: string }[] = [];
+      this.stepData.data.forEach((item)=>{
+          const option = {
+            label: item.name,
+            value: item.id,
+            disable: item.available,
+            star:item.star
+          };
+          options.push(option);
+    })  
 
-  options.push(option);
-});
+    return options
+  }
 
-function selectedItem(value: string){
-    ApplicationDataStore.setSelectedRestaurant(value)
+  selectedItem(value: string){
+    ApplicationDS().setSelectedRestaurant(value)
+  }
+
 }
+
+export default toNative(ChooseRestaurant);
+
+
+
 </script>
+
 
 <style lang="scss" scoped>
 .option-items{

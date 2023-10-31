@@ -3,15 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] =
     [{
         path: '/',
-        component: () => import('../layouts/MainLayout.vue'),
-        children: [
-            {
-                name: 'Home',
-                path: '',
-                component: () => import('../views/SampleView.vue')
-            },
-            
-        ]
+        component: () => import('../components/wizard.vue'),
     }];
 
 export default routes;
